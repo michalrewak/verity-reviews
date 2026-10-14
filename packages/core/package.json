@@ -1,0 +1,8 @@
+{
+  "name": "@verity/core",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  }
+}
