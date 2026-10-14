@@ -225,7 +225,53 @@ E0–E1 start now, alongside the extension work. E2 depends on the API and passk
 - **Validator liveness**: if reveal rate drops below 80 %, assignment size and stakes rise.
 - KPIs: verified-contact share of rewarded reviews; challenge and upheld-challenge rates; median settlement time; reward concentration (Gini across tier-2 humans and across nodes); replica count distribution for the long tail; audit-retrieval success; share of claimed rewards sold within 7 days.
 
-## 11. Open decisions
+## 11. Founder, team, and treasury transparency
+
+Insiders earn at the pace the network grows, never faster. Everything below is published in the white paper and on the project site before TGE, with the on-chain addresses, and is enforced by contracts rather than promises.
+
+### 11.1 Allocations and locks
+
+| Bucket | Share | Enforcement | Who controls |
+|---|---|---|---|
+| Founder | ≤ 10 % (from the 15 % team bucket) | `VestingWallet`: 12-month cliff, then 48-month linear; no acceleration clause | founder address, published |
+| Future team and early builders | remainder of the 15 % | same vesting schedule per grant; grants proposed and approved by governance; unallocated balance sits in the timelock | timelock |
+| Early backers | 8 % | 6-month cliff, 36-month linear; investor addresses and terms published | investors, published |
+| Treasury | 15 % | `Timelock` (≥ 72 h delay) behind `Governor`; quarterly budget published in advance, every spend tagged on-chain | token holders |
+| Liquidity | 5 % | paired at TGE on a Base DEX; LP tokens locked 24 months in a public locker | locker contract |
+| Epoch emission | 45 % | `EmissionSchedule`, immutable; no minting function exists after deployment | nobody |
+| Ecosystem and node grants | 12 % | timelock, 5-year release; grant list public | token holders |
+
+Total supply is fixed at deployment. There is no admin mint, no blacklist, and no transfer tax.
+
+### 11.2 Founder compensation during build-out
+
+Vesting pays nothing for 12 months, so operating work is paid separately and visibly:
+
+- a **service agreement between the founder's operating entity and the DAO**, denominated in stablecoin or VERA, for infrastructure, attester operation, and development, approved by governance and renewed annually;
+- the agreement, invoices, and payments are public; the rate is benchmarked against comparable protocol-operator agreements and published alongside;
+- the founder abstains from voting on their own agreement.
+
+### 11.3 Protocol revenue
+
+Merchant verified-response fees, analytics API fees, and indexer bonds flow to the treasury, not to the founder. Governance sets the split between buyback-to-emission, operator budgets, and reserves. The founder's upside from revenue is only through the same token everyone else holds.
+
+### 11.4 Commitments
+
+- Founder and team addresses are published and tagged; any transfer from them is visible in a public dashboard.
+- No sales by insiders before the cliff, and no OTC deals outside the published schedule.
+- No "advisor" allocations that are insiders under another name; every advisor grant names the person and the deliverable.
+- Insider participation in epoch rewards is allowed only through the same tiers, caps, and challenge windows as everyone else, and insider keys are labelled in the snapshot so anyone can audit their earnings.
+- A breach of any of the above is grounds for governance to cancel unvested grants; the vesting contracts expose a `revoke` callable only by the timelock.
+
+### 11.5 How holders trade VERA
+
+1. **Before TGE** — no trading and no pre-sale. Testnet points are non-transferable and convert into first-epoch allocations.
+2. **At TGE on Base** — liquidity on a Base DEX (Uniswap v3 or Aerodrome). Anyone can swap from a self-custodial wallet; Verity users claim rewards into the same passkey-controlled smart wallet that signs their reviews.
+3. **Inside the protocol** — stake, deposits, node bonds, bounties, and merchant fees create demand that does not depend on exchanges.
+4. **Centralized exchanges** — listings are the exchange's decision; the project does not pay listing fees from the treasury without a governance vote. MiCA compliance is a prerequisite for EU-facing venues.
+5. **Reporting** — claim history is exportable per key for tax purposes; the operator evaluates DAC8 obligations.
+
+## 12. Open decisions
 
 1. Final names for token and reputation (coupled to the product-name decision).
 2. Base vs. Arbitrum; own court vs. Kleros appeals.
@@ -233,3 +279,4 @@ E0–E1 start now, alongside the extension work. E2 depends on the API and passk
 4. Whether to build the custody layer on raw libp2p/IPFS primitives or adopt a Swarm/Codex-style erasure-coded client and only add the VERA incentive layer.
 5. Whether merchant bounties are allowed at TGE or deferred until independence signals are proven.
 6. Issuer entity and jurisdiction for the MiCA notification.
+7. Founder share within the team bucket and the operating entity for the DAO service agreement.
