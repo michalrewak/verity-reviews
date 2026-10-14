@@ -31,6 +31,7 @@ Entity
 Reviews attach to an entity and optionally to an offer or visit. A URL is only one reference and must not be the primary identity.
 
 The canonical strategies and merge rules are specified in [Entity identity](./ENTITY-IDENTITY.md).
+Page extraction and its trust boundary are specified in [Browser metadata adapter](./BROWSER-ADAPTER.md).
 
 ## Review event
 

@@ -31,6 +31,7 @@ Early research and MVP implementation.
 ```text
 docs/                 Research, architecture, threat model, and decisions
 packages/core/        Dependency-free domain model and validation
+packages/browser-adapter/ Browser metadata extraction prototype
 ROADMAP.md            Milestones and execution plan
 ```
 
