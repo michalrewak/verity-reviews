@@ -1,5 +1,8 @@
 import { createEntityId, validateEntityId } from "../../core/src/entity.mjs";
-import { validateSignedReviewEvent } from "../../core/src/signed-review.mjs";
+import {
+  validateSignedReviewEvent,
+  verifyReviewEventSignature
+} from "../../core/src/signed-review.mjs";
 
 const MAX_BODY_BYTES = 1_000_000;
 
@@ -118,6 +121,10 @@ async function handleReviews(request, response, store, url, segments) {
     const errors = validateSignedReviewEvent(event);
     if (errors.length > 0) {
       throw invalid(`signed review is invalid: ${errors.join("; ")}`);
+    }
+    const verification = await verifyReviewEventSignature(event);
+    if (!verification.valid) {
+      throw invalid(`signed review failed verification: ${verification.errors.join("; ")}`);
     }
     if (event.review.status !== "published") {
       throw invalid("only published reviews can be submitted");

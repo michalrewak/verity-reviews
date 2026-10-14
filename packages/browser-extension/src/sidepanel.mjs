@@ -1,9 +1,9 @@
-import { extractEntityCandidates } from "./shared/browser-adapter/extract.mjs";
+import { extractEntityCandidates } from "./shared/browser-adapter/src/extract.mjs";
 import {
   createEvidenceCommitment,
   createEvidenceNonce
-} from "./shared/core/evidence.mjs";
-import { canonicalJson, createSignedReviewEvent } from "./shared/core/signed-review.mjs";
+} from "./shared/core/src/evidence.mjs";
+import { canonicalJson, createSignedReviewEvent } from "./shared/core/src/signed-review.mjs";
 import { authorizeSigning, createPasskeyBackedKey, getIdentity } from "./passkey.mjs";
 import { loadDraft, removeDraft, saveDraft, saveSignedEvent } from "./storage.mjs";
 

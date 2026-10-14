@@ -1,4 +1,5 @@
 import { getAuthorKey, putAuthorKey } from "./key-store.mjs";
+import { encodeEd25519DidKey } from "./shared/core/src/did-key.mjs";
 
 const IDENTITY_KEY = "authorIdentity";
 
@@ -13,7 +14,7 @@ export async function createPasskeyBackedKey() {
   const credential = await navigator.credentials.create({
     publicKey: {
       challenge: crypto.getRandomValues(new Uint8Array(32)),
-      rp: { name: "Verity Reviews" },
+      rp: { id: location.hostname, name: "Verity Reviews" },
       user: {
         id: userId,
         name: `verity-${crypto.randomUUID()}@local`,
@@ -40,8 +41,7 @@ export async function createPasskeyBackedKey() {
     ["sign", "verify"]
   );
   const publicKey = await crypto.subtle.exportKey("raw", signingKeys.publicKey);
-  const digest = await crypto.subtle.digest("SHA-256", publicKey);
-  const keyId = `urn:verity:key:sha256:${toHex(digest)}`;
+  const keyId = encodeEd25519DidKey(publicKey);
   const identity = {
     keyId,
     credentialId: toBase64Url(credential.rawId),
@@ -60,6 +60,7 @@ export async function authorizeSigning(identity, challenge) {
   const assertion = await navigator.credentials.get({
     publicKey: {
       challenge,
+      rpId: location.hostname,
       allowCredentials: [{
         type: "public-key",
         id: fromBase64Url(identity.credentialId)
@@ -81,12 +82,6 @@ function requirePasskeys() {
   if (!globalThis.PublicKeyCredential || !navigator.credentials) {
     throw new Error("this browser does not support passkeys");
   }
-}
-
-function toHex(buffer) {
-  return [...new Uint8Array(buffer)]
-    .map((byte) => byte.toString(16).padStart(2, "0"))
-    .join("");
 }
 
 function toBase64Url(buffer) {

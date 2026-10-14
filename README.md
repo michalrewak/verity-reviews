@@ -79,9 +79,12 @@ node packages/browser-extension/scripts/build.mjs
 ```
 
 Load `packages/browser-extension/dist` as an unpacked extension in a
-Chromium-based browser. Opening its side panel extracts product/place metadata
-from the active tab, resolves the canonical entity through the API, restores
-local drafts, and publishes passkey-authorized Ed25519 events. A selected
+Chromium-based browser. Edge or Chrome 137 or newer is required, because the
+author key uses Ed25519 in Web Crypto. Opening its side panel extracts
+product/place metadata from the active tab, resolves the canonical entity
+through the API, restores local drafts, and publishes passkey-authorized
+Ed25519 events. The author key is published as an Ed25519 `did:key`, so any
+client can verify a review without contacting Verity. A selected
 evidence file is reduced to a salted SHA-256 commitment in memory; the file is
 not stored or uploaded. The random commitment opening remains only in local
 extension storage so the author can later disclose it with the evidence.

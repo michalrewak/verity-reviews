@@ -17,7 +17,10 @@ Browser extension / mobile app
 
 The private MVP is deliberately centralized enough to test, but all important
 review records have a portable signed representation. `packages/api` provides
-versioned HTTP endpoints backed by an atomically replaced JSON file. PostgreSQL
+versioned HTTP endpoints backed by an atomically replaced JSON file. It verifies
+every submitted event's content digest and Ed25519 signature against the public
+key decoded from the author's `did:key`, so the store cannot be used to publish
+forged records or to overwrite a review with altered content. PostgreSQL
 and search remain the intended production persistence layer. Federation and
 anchoring are later protocol features, not prerequisites for testing the
 product.
