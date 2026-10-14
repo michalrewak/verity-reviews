@@ -1,6 +1,6 @@
 # Verity roadmap
 
-## Phase 0 — foundation (current)
+## Phase 0 — foundation
 
 - [x] Capture the product thesis and non-goals.
 - [x] Document market, legal, and technical constraints.
@@ -14,17 +14,17 @@
 ## Phase 1 — private MVP
 
 - [x] Prototype the injected review experience for shop, map, and video pages.
-- [ ] Package the prototype as a Manifest V3 browser extension with a side panel.
-- [ ] Detect the active page type and extract candidate entity metadata.
-- [ ] Resolve extracted metadata to a canonical Verity entity.
-- [ ] Persist local drafts and signed review events in extension storage.
-- [ ] Create a small API for products, places, and reviews.
-- [ ] Add passkey-backed author keys.
+- [x] Package the prototype as a Manifest V3 browser extension with a side panel.
+- [x] Detect the active page type and extract candidate entity metadata.
+- [x] Resolve extracted metadata to a canonical Verity entity.
+- [x] Persist local drafts and signed review events in extension storage.
+- [x] Create a small API for products, places, and reviews.
+- [x] Add passkey-backed author keys.
 - [x] Add review signing and content-addressed identifiers.
 - [x] Add a browser metadata adapter that reads canonical product and place metadata.
-- [ ] Connect the browser extension to the metadata adapter and API.
-- [ ] Add a mobile share-sheet flow.
-- [ ] Add evidence commitments without storing receipts in plaintext.
+- [x] Connect the browser extension to the metadata adapter and API.
+- [x] Add a mobile share-sheet flow.
+- [x] Add evidence commitments without storing receipts in plaintext.
 
 ## Phase 2 — trust and moderation
 

@@ -15,7 +15,8 @@ Verity is not a review marketplace and does not reward positive sentiment. The i
 
 ## Status
 
-Early research and MVP implementation.
+Phase 1 private MVP implementation. The API, unpacked Manifest V3 extension, and
+mobile Web Share Target are intended for local development and private testing.
 
 ## MVP scope
 
@@ -32,6 +33,9 @@ Early research and MVP implementation.
 docs/                 Research, architecture, threat model, and decisions
 packages/core/        Dependency-free domain model and validation
 packages/browser-adapter/ Browser metadata extraction prototype
+packages/api/         Local JSON-backed products, places, and reviews API
+packages/browser-extension/ Manifest V3 side-panel extension source
+packages/mobile-share/ Installable mobile Web Share Target
 ROADMAP.md            Milestones and execution plan
 ```
 
@@ -46,13 +50,53 @@ ROADMAP.md            Milestones and execution plan
 
 ## Local development
 
-The core package uses Node's built-in test runner and requires Node.js 20 or newer.
+The packages use Node's built-in test runner and require Node.js 20 or newer.
 
 ```powershell
-node --test packages/core/test/review.test.mjs
+node --test packages/core/test/*.test.mjs
+node --test packages/browser-adapter/test/*.test.mjs
+node --test packages/api/test/*.test.mjs
+node --test packages/mobile-share/test/*.test.mjs
 ```
 
-### Initial app demo
+### Private MVP
+
+Start the local API:
+
+```powershell
+node packages/api/src/server.mjs
+```
+
+The API listens on `http://127.0.0.1:8787` and writes its local state to
+`data/verity.json`. Set `VERITY_DATA_FILE` to change the location and
+`VERITY_ALLOWED_ORIGINS` to a comma-separated list when hosting a client on
+another origin.
+
+Build the browser extension:
+
+```powershell
+node packages/browser-extension/scripts/build.mjs
+```
+
+Load `packages/browser-extension/dist` as an unpacked extension in a
+Chromium-based browser. Opening its side panel extracts product/place metadata
+from the active tab, resolves the canonical entity through the API, restores
+local drafts, and publishes passkey-authorized Ed25519 events. A selected
+evidence file is reduced to a salted SHA-256 commitment in memory; the file is
+not stored or uploaded. The random commitment opening remains only in local
+extension storage so the author can later disclose it with the evidence.
+
+Start the installable mobile share target:
+
+```powershell
+node packages/mobile-share/server.mjs
+```
+
+Open `http://127.0.0.1:4174`, install it as a PWA, and share an indexed product
+or place URL to Verity. The mobile flow resolves the URL and stores an unsigned
+private draft on that device.
+
+### Static interface demo
 
 The repository includes a dependency-free local preview of the browser-extension experience. It simulates Verity detecting the entity on a shop, Google Maps, or YouTube page and injecting an independent, signed review panel:
 
@@ -60,7 +104,9 @@ The repository includes a dependency-free local preview of the browser-extension
 node demo/server.mjs
 ```
 
-Open <http://127.0.0.1:4173> in a browser, click the Verity extension icon, and switch between the page scenarios. The demo is intentionally static, with a local-only review draft interaction; API, passkey, extension packaging, and signing integrations remain future MVP work.
+Open <http://127.0.0.1:4173> in a browser, click the simulated Verity extension
+icon, and switch between the page scenarios. This is a static visual demo; use
+the Manifest V3 package above for the integrated MVP.
 
 ## License
 

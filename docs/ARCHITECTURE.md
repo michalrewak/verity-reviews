@@ -1,6 +1,6 @@
 # Architecture
 
-## First implementation
+## Phase 1 implementation
 
 ```text
 Browser extension / mobile app
@@ -8,14 +8,29 @@ Browser extension / mobile app
               v
         Verity API
               |
-       PostgreSQL + search
+       local JSON store
               |
       signed review events
               |
    optional external indexers
 ```
 
-The first implementation is deliberately centralized enough to ship, but all important records have a portable signed representation. Federation and anchoring are later protocol features, not prerequisites for testing the product.
+The private MVP is deliberately centralized enough to test, but all important
+review records have a portable signed representation. `packages/api` provides
+versioned HTTP endpoints backed by an atomically replaced JSON file. PostgreSQL
+and search remain the intended production persistence layer. Federation and
+anchoring are later protocol features, not prerequisites for testing the
+product.
+
+The Manifest V3 extension runs the shared browser metadata adapter against a
+snapshot of the active page. It sends product and place candidates to the API
+for canonical resolution, stores drafts and signed-event publication state in
+extension storage, and keeps device-bound CryptoKeys in IndexedDB. A passkey
+assertion with required user verification is challenged with the hash of the
+exact review payload and gates each signing operation.
+
+The installable mobile PWA declares a Web Share Target. It resolves shared URLs
+through the same API and stores unsigned drafts locally for later signing.
 
 ## Canonical entity model
 
@@ -56,9 +71,10 @@ The portable envelope and canonical serialization rules are specified in [Signed
 
 | Data | Initial storage | Future option |
 |---|---|---|
-| Review text | PostgreSQL | author repositories + incentivized Verity swarm (erasure-coded shards on user-run custody nodes) |
-| Hash/signature | PostgreSQL | L2 anchor |
+| Review text | local JSON API store | PostgreSQL, then author repositories + incentivized Verity swarm |
+| Hash/signature | local JSON API store | PostgreSQL and optional L2 anchor |
 | Receipt image | private object storage | encrypted user-controlled storage |
+| Evidence commitment | signed review; source evidence is not retained | signed event replicas |
 | Public attachments | object storage | IPFS with pinning |
 | Dispute outcome | PostgreSQL append-only log | smart contract anchor |
 

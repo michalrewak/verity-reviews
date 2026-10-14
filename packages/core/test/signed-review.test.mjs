@@ -17,7 +17,7 @@ const review = {
   createdAt: "2026-10-14T17:00:00.000Z",
   revision: 1,
   status: "published",
-  evidenceCommitment: "sha256:example"
+  evidenceCommitment: `sha256:${"a".repeat(64)}`
 };
 
 test("serializes object keys deterministically", () => {

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#176b51">
+    <title>Share to Verity</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main>
+      <p class="brand">VERITY</p>
+      <h1>Review a shared page</h1>
+      <p id="status" role="status">Reading the shared link…</p>
+      <section id="entity" hidden>
+        <small id="entity-type"></small>
+        <h2 id="entity-name"></h2>
+        <code id="entity-id"></code>
+        <form id="draft-form">
+          <label>Rating
+            <select id="rating" required>
+              <option value="">Choose</option>
+              <option value="5">5 — Excellent</option>
+              <option value="4">4 — Good</option>
+              <option value="3">3 — Mixed</option>
+              <option value="2">2 — Poor</option>
+              <option value="1">1 — Very poor</option>
+            </select>
+          </label>
+          <label>Review
+            <textarea id="review-text" minlength="20" required></textarea>
+          </label>
+          <button type="submit">Save private draft</button>
+        </form>
+      </section>
+      <p id="shared-url"></p>
+    </main>
+    <script type="module" src="app.mjs"></script>
+  </body>
+</html>

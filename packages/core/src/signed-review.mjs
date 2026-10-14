@@ -38,7 +38,7 @@ export async function createSignedReviewEvent(review, privateKey, cryptoProvider
 }
 
 export async function verifySignedReviewEvent(event, publicKey, cryptoProvider = globalThis.crypto) {
-  const errors = validateEventEnvelope(event);
+  const errors = validateSignedReviewEvent(event);
   if (errors.length > 0) {
     return { valid: false, errors };
   }
@@ -68,7 +68,7 @@ export async function verifySignedReviewEvent(event, publicKey, cryptoProvider =
   return { valid: errors.length === 0, errors };
 }
 
-function validateEventEnvelope(event) {
+export function validateSignedReviewEvent(event) {
   if (!event || typeof event !== "object") {
     return ["event must be an object"];
   }

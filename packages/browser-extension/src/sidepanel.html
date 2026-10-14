@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Verity</title>
+    <link rel="stylesheet" href="sidepanel.css">
+  </head>
+  <body>
+    <header>
+      <div><strong>VERITY</strong><span>independent reviews</span></div>
+      <button id="refresh" type="button">Refresh page</button>
+    </header>
+    <main>
+      <p id="status" role="status">Reading the active page…</p>
+      <section id="entity-card" hidden>
+        <small id="page-type"></small>
+        <h1 id="entity-name"></h1>
+        <code id="entity-id"></code>
+        <p id="entity-source"></p>
+      </section>
+      <section id="review-card" hidden>
+        <h2>Your review</h2>
+        <form id="review-form">
+          <label>Rating
+            <select id="rating" required>
+              <option value="">Choose</option>
+              <option value="5">5 — Excellent</option>
+              <option value="4">4 — Good</option>
+              <option value="3">3 — Mixed</option>
+              <option value="2">2 — Poor</option>
+              <option value="1">1 — Very poor</option>
+            </select>
+          </label>
+          <label>Review
+            <textarea id="review-text" minlength="20" required></textarea>
+          </label>
+          <label>Optional evidence
+            <input id="evidence" type="file">
+          </label>
+          <small>Only a salted SHA-256 commitment is stored. The selected file is never uploaded.</small>
+          <button type="submit">Sign and publish</button>
+        </form>
+      </section>
+      <section>
+        <h2>Identity</h2>
+        <p id="identity">No author key yet.</p>
+        <button id="create-passkey" type="button">Create passkey-backed key</button>
+      </section>
+      <details>
+        <summary>Settings</summary>
+        <label>API URL <input id="api-url" type="url" value="http://127.0.0.1:8787"></label>
+        <button id="save-settings" type="button">Save</button>
+      </details>
+      <ul id="diagnostics"></ul>
+    </main>
+    <script type="module" src="sidepanel.mjs"></script>
+  </body>
+</html>
