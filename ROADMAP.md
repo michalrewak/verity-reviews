@@ -6,17 +6,23 @@
 - [x] Document market, legal, and technical constraints.
 - [x] Define a portable review record.
 - [x] Implement deterministic validation for the core record.
+- [ ] Select a product name with an available `.com` domain and complete a trademark screen.
 - [ ] Decide the project license and contribution policy.
 - [x] Define deterministic identity rules for products, offers, places, and services.
 - [ ] Validate the entity model against a broader corpus of real product and local-business URLs.
 
 ## Phase 1 — private MVP
 
+- [x] Prototype the injected review experience for shop, map, and video pages.
+- [ ] Package the prototype as a Manifest V3 browser extension with a side panel.
+- [ ] Detect the active page type and extract candidate entity metadata.
+- [ ] Resolve extracted metadata to a canonical Verity entity.
+- [ ] Persist local drafts and signed review events in extension storage.
 - [ ] Create a small API for products, places, and reviews.
 - [ ] Add passkey-backed author keys.
 - [x] Add review signing and content-addressed identifiers.
 - [x] Add a browser metadata adapter that reads canonical product and place metadata.
-- [ ] Package the metadata adapter in a browser extension.
+- [ ] Connect the browser extension to the metadata adapter and API.
 - [ ] Add a mobile share-sheet flow.
 - [ ] Add evidence commitments without storing receipts in plaintext.
 

@@ -52,6 +52,16 @@ The core package uses Node's built-in test runner and requires Node.js 20 or new
 node --test packages/core/test/review.test.mjs
 ```
 
+### Initial app demo
+
+The repository includes a dependency-free local preview of the browser-extension experience. It simulates Verity detecting the entity on a shop, Google Maps, or YouTube page and injecting an independent, signed review panel:
+
+```powershell
+node demo/server.mjs
+```
+
+Open <http://127.0.0.1:4173> in a browser, click the Verity extension icon, and switch between the page scenarios. The demo is intentionally static, with a local-only review draft interaction; API, passkey, extension packaging, and signing integrations remain future MVP work.
+
 ## License
 
 The license will be selected before the first public release.
