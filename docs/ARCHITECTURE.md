@@ -49,6 +49,8 @@ The MVP record contains:
 
 The core package validates shape and invariants. Cryptographic signing, key custody, and transport belong to the application layer.
 
+The portable envelope and canonical serialization rules are specified in [Signed review events](./SIGNED-EVENTS.md).
+
 ## Data placement
 
 | Data | Initial storage | Future option |

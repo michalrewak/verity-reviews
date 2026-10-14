@@ -14,7 +14,7 @@
 
 - [ ] Create a small API for products, places, and reviews.
 - [ ] Add passkey-backed author keys.
-- [ ] Add review signing and content-addressed identifiers.
+- [x] Add review signing and content-addressed identifiers.
 - [ ] Add a browser extension that reads canonical product metadata.
 - [ ] Add a mobile share-sheet flow.
 - [ ] Add evidence commitments without storing receipts in plaintext.

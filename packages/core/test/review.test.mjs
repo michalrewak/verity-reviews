@@ -10,6 +10,7 @@ const validReview = {
   rating: 4,
   text: "The product performed well after three weeks of daily use.",
   createdAt: "2026-10-14T17:00:00.000Z",
+  revision: 1,
   status: "published",
   evidenceCommitment: "sha256:example"
 };
@@ -38,4 +39,9 @@ test("rejects short text", () => {
 
 test("does not require evidence for an unverified review", () => {
   assert.equal(isValidReview({ ...validReview, evidenceCommitment: undefined }), true);
+});
+
+test("requires a positive revision number", () => {
+  const errors = validateReview({ ...validReview, revision: 0 });
+  assert.ok(errors.includes("revision must be a positive integer"));
 });

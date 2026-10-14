@@ -31,6 +31,9 @@ export function validateReview(review) {
   if (typeof review.createdAt !== "string" || Number.isNaN(Date.parse(review.createdAt))) {
     errors.push("createdAt must be an ISO date string");
   }
+  if (!Number.isInteger(review.revision) || review.revision < 1) {
+    errors.push("revision must be a positive integer");
+  }
   if (!REVIEW_STATUSES.has(review.status)) {
     errors.push("status is invalid");
   }
