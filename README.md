@@ -24,7 +24,7 @@ Early research and MVP implementation.
 3. Product/place identity resolution independent of a single merchant URL.
 4. Browser-extension and mobile-client integration contracts.
 5. Transparent moderation and dispute records.
-6. Reputation points before any transferable token.
+6. Economic layer: a transferable token (`VERA`, working name) with three reward pools — contributions, verification, and user-run custody/delivery of verified records — gated by a non-transferable Trust Score. See [docs/ECONOMIC-LAYER.md](./docs/ECONOMIC-LAYER.md).
 
 ## Repository layout
 
