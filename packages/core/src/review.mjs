@@ -1,4 +1,6 @@
-const REVIEW_TYPES = new Set(["product", "service", "place"]);
+import { validateEntityId } from "./entity.mjs";
+
+const REVIEW_TYPES = new Set(["product", "offer", "service", "place"]);
 const REVIEW_STATUSES = new Set(["draft", "published", "under_review", "hidden"]);
 
 export function validateReview(review) {
@@ -12,10 +14,10 @@ export function validateReview(review) {
     errors.push("id must be a string of at least 8 characters");
   }
   if (!REVIEW_TYPES.has(review.entityType)) {
-    errors.push("entityType must be product, service, or place");
+    errors.push("entityType must be product, offer, service, or place");
   }
-  if (typeof review.entityId !== "string" || review.entityId.length < 1) {
-    errors.push("entityId is required");
+  if (!validateEntityId(review.entityId, review.entityType)) {
+    errors.push("entityId must be a canonical Verity ID matching entityType");
   }
   if (typeof review.authorKeyId !== "string" || review.authorKeyId.length < 1) {
     errors.push("authorKeyId is required");

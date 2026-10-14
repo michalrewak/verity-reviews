@@ -7,7 +7,8 @@
 - [x] Define a portable review record.
 - [x] Implement deterministic validation for the core record.
 - [ ] Decide the project license and contribution policy.
-- [ ] Validate the entity model against real product and local-business URLs.
+- [x] Define deterministic identity rules for products, offers, places, and services.
+- [ ] Validate the entity model against a broader corpus of real product and local-business URLs.
 
 ## Phase 1 — private MVP
 
