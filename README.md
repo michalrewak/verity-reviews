@@ -87,7 +87,8 @@ Ed25519 events. The author key is published as an Ed25519 `did:key`, so any
 client can verify a review without contacting Verity. A selected
 evidence file is reduced to a salted SHA-256 commitment in memory; the file is
 not stored or uploaded. The random commitment opening remains only in local
-extension storage so the author can later disclose it with the evidence.
+extension storage so the author can later disclose it with the evidence. Use
+`Alt+Shift+V` to open the Verity side panel from the active page.
 
 Start the installable mobile share target:
 

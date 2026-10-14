@@ -21,6 +21,14 @@
   "action": {
     "default_title": "Open Verity"
   },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Alt+Shift+V"
+      },
+      "description": "Open Verity"
+    }
+  },
   "background": {
     "service_worker": "service-worker.js",
     "type": "module"
