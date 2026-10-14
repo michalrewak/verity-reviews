@@ -19,7 +19,13 @@
 | Collusive voting | reviewer independence weighting | randomized juries and commit/reveal |
 | Selective hiding | signed export and audit log | multiple indexers |
 | Defamation/PII | report and appeal workflow | policy registry and external dispute providers |
-| Reward farming | no transferable token, delayed points | stake and slashing with audited parameters |
+| Reward farming | rating-blind scoring, challenge-window settlement, per-human caps by personhood tier | staked validation with slashing, per-entity emission caps, automatic emission pause |
+| Validator herding or collusion | random assignment, commit/reveal | appeal rounds with fresh juries, optional external court |
+| Lazy or sybil hosts | keyed replicas, random custody challenges, node bonds, replication-target cap | decentralized challengers, lazy repair |
+| Self-dealing retrieval | tier-weighted delivery receipts, per-pair caps | audit retrievals from anonymous vantage points |
+| Merchant-funded bounties steering ratings | bounties disclosed on the entity page and never rating-conditional | independence signals gate merchant bounties |
+
+The economic controls are specified in [Economic layer](./ECONOMIC-LAYER.md) and [Decentralized storage](./DECENTRALIZED-STORAGE.md).
 
 ## Non-goals
 

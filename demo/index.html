@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Demo wtyczki Verity nakładającej niezależne komentarze na odwiedzaną stronę">
+    <title>Demo wtyczki Verity</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <div class="demo-toolbar">
+      <div>
+        <span class="demo-label">DEMO WTYCZKI</span>
+        <strong>Otwórz Verity na dowolnej stronie</strong>
+      </div>
+      <div class="scenario-switcher" aria-label="Wybierz typ strony">
+        <button class="scenario active" data-scenario="shop">Sklep</button>
+        <button class="scenario" data-scenario="maps">Google Maps</button>
+        <button class="scenario" data-scenario="youtube">YouTube</button>
+      </div>
+      <span class="demo-hint">Kliknij zieloną ikonę Verity →</span>
+    </div>
+
+    <div class="browser-window">
+      <div class="browser-chrome">
+        <div class="window-buttons"><i></i><i></i><i></i></div>
+        <div class="browser-nav"><button>‹</button><button>›</button><button>↻</button></div>
+        <div class="address-bar"><span>🔒</span><span id="address">nordgoods.example/products/field-pack-22</span></div>
+        <div class="extension-icons"><span>☆</span><button id="extension-button" aria-label="Otwórz Verity"><b>V</b><i id="extension-badge">12</i></button><span>⋮</span></div>
+      </div>
+
+      <div class="page-area">
+        <main class="host-page shop-page" id="host-page">
+          <header class="shop-header">
+            <a class="shop-logo" href="#">NØRD <span>GOODS</span></a>
+            <nav><a href="#">Plecaki</a><a href="#">Akcesoria</a><a href="#">O nas</a></nav>
+            <div class="shop-actions">Szukaj&nbsp;&nbsp; Konto&nbsp;&nbsp; Koszyk (0)</div>
+          </header>
+          <div class="crumbs">Strona główna / Plecaki / Field Pack 22L</div>
+          <section class="product">
+            <div class="product-gallery">
+              <div class="product-photo">
+                <div class="bag">
+                  <div class="bag-top"></div><div class="bag-pocket"></div><div class="bag-label">NØRD</div>
+                </div>
+                <span class="photo-count">1 / 5</span>
+              </div>
+              <div class="thumbs"><i></i><i></i><i></i></div>
+            </div>
+            <div class="product-details">
+              <span class="collection">EVERYDAY CARRY</span>
+              <h1>Field Pack 22L</h1>
+              <div class="native-rating">★★★★★ <u>48 opinii sklepu</u></div>
+              <strong class="price">549,00 zł</strong>
+              <p>Minimalistyczny plecak miejski wykonany z odpornego na warunki atmosferyczne materiału. Zaprojektowany do codziennego użytku.</p>
+              <div class="option-label">Kolor <b>Forest Green</b></div>
+              <div class="colors"><i></i><i></i><i></i></div>
+              <button class="cart-button">Dodaj do koszyka</button>
+              <ul><li>Darmowa dostawa od 300 zł</li><li>30 dni na zwrot</li><li>2 lata gwarancji</li></ul>
+            </div>
+          </section>
+        </main>
+
+        <aside class="verity-panel" id="verity-panel" aria-label="Panel Verity">
+          <header class="verity-header">
+            <div class="verity-brand"><span>V</span><strong>verity</strong></div>
+            <div class="panel-actions"><button title="Więcej opcji">•••</button><button id="close-panel" aria-label="Zamknij panel">×</button></div>
+          </header>
+
+          <div class="detected">
+            <span class="pulse"></span>
+            <div><small>ROZPOZNANO NA TEJ STRONIE</small><strong id="detected-type">Produkt</strong></div>
+            <span class="confidence">98%</span>
+          </div>
+
+          <section class="entity-summary">
+            <div class="entity-image" id="entity-image">◒</div>
+            <div><h2 id="entity-title">Field Pack 22L</h2><p id="entity-subtitle">NØRD Goods · Model FP-22</p><span class="identity-check">✓ Połączono z kanonicznym obiektem</span></div>
+          </section>
+
+          <section class="score-block">
+            <div class="score"><strong id="score">4.4</strong><span>★★★★★</span><small><b id="review-count">12</b> niezależnych opinii</small></div>
+            <div class="bars">
+              <div><span>5</span><i><b style="width:72%"></b></i><small>8</small></div>
+              <div><span>4</span><i><b style="width:32%"></b></i><small>3</small></div>
+              <div><span>3</span><i><b style="width:12%"></b></i><small>1</small></div>
+              <div><span>2</span><i><b style="width:0"></b></i><small>0</small></div>
+              <div><span>1</span><i><b style="width:0"></b></i><small>0</small></div>
+            </div>
+          </section>
+
+          <div class="trust-row">
+            <span><b>4</b> z dowodem kontaktu</span>
+            <span><b>12/12</b> podpisanych</span>
+          </div>
+
+          <div class="review-heading">
+            <strong>Opinie społeczności</strong>
+            <button>Najbardziej pomocne⌄</button>
+          </div>
+
+          <div class="verity-reviews" id="verity-reviews">
+            <article>
+              <div class="review-top"><span class="avatar orange">AL</span><div><strong>Alex L.</strong><small>2 dni temu</small></div><span class="verified-pill">✓ DOWÓD ZAKUPU</span></div>
+              <div class="review-stars">★★★★★</div>
+              <p>Po trzech tygodniach to mój domyślny plecak. Szelki są wygodne nawet z laptopem i aparatem.</p>
+              <footer><span>⌁ Podpisano <code>did:key:z6Mk…8aQ</code></span><button>♡ 8</button></footer>
+            </article>
+            <article>
+              <div class="review-top"><span class="avatar purple">MR</span><div><strong>Mira R.</strong><small>tydzień temu</small></div></div>
+              <div class="review-stars">★★★★<i>★</i></div>
+              <p>Dobra organizacja i czysty profil. Kieszeń na butelkę jest trochę ciasna, ale materiał świetnie znosi deszcz.</p>
+              <footer><span>⌁ Podpisano <code>did:key:z6Mk…2nP</code></span><button>♡ 5</button></footer>
+            </article>
+          </div>
+
+          <div class="panel-footer">
+            <button class="write-button" id="new-review-button">Napisz niezależną opinię <span>＋</span></button>
+            <small>Opinie Verity nie należą do tej witryny.</small>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <div class="modal-backdrop" id="review-modal" hidden>
+      <form class="review-modal" id="review-form">
+        <button class="modal-close" type="button" id="close-modal" aria-label="Zamknij">×</button>
+        <span class="form-eyebrow">NIEZALEŻNY, PRZENOŚNY WPIS</span>
+        <h2>Dodaj swoją opinię</h2>
+        <p id="form-entity">Field Pack 22L · NØRD Goods</p>
+        <label>Ocena <span class="rating-input" id="rating-input" aria-label="Ocena"></span></label>
+        <label for="review-text">Co warto wiedzieć?</label>
+        <textarea id="review-text" minlength="20" placeholder="Napisz coś pomocnego dla kolejnej osoby…" required></textarea>
+        <label class="evidence-option"><input type="checkbox"> Mam dowód zakupu lub kontaktu <span>opcjonalne</span></label>
+        <div class="modal-foot"><span id="form-status">Wpis zostanie podpisany Twoim kluczem.</span><button class="save-button" type="submit">Zapisz wersję roboczą →</button></div>
+      </form>
+    </div>
+    <script src="/app.js"></script>
+  </body>
+</html>

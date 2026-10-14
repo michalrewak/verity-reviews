@@ -56,7 +56,7 @@ The portable envelope and canonical serialization rules are specified in [Signed
 
 | Data | Initial storage | Future option |
 |---|---|---|
-| Review text | PostgreSQL | signed event repositories |
+| Review text | PostgreSQL | author repositories + incentivized Verity swarm (erasure-coded shards on user-run custody nodes) |
 | Hash/signature | PostgreSQL | L2 anchor |
 | Receipt image | private object storage | encrypted user-controlled storage |
 | Public attachments | object storage | IPFS with pinning |
@@ -66,4 +66,4 @@ Do not store raw receipts, names, addresses, or review text on a public blockcha
 
 ## Reward model
 
-The initial reward is non-transferable reputation. A review cannot earn it simply by being positive. Candidate reward signals are evidence quality, successful challenge resolution, useful corrections, and long-term predictive accuracy.
+Two assets: a transferable token (`VERA`, working name) paid per epoch from a fixed emission split across contribution, verification, and custody/delivery pools, and a non-transferable Trust Score that gates eligibility and multiplies rewards. Scoring is rating-blind by construction and settles only after a challenge window. Users may host and serve verified records and earn by importance-weighted proofs of custody and delivery. Specifications: [Economic layer](./ECONOMIC-LAYER.md), [Decentralized storage](./DECENTRALIZED-STORAGE.md).
