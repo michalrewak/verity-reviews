@@ -81,6 +81,61 @@ test("reports broken JSON-LD and returns an Open Graph fallback offer", async ()
   assert.equal(result.diagnostics[0].code, "INVALID_JSON_LD");
 });
 
+test("keeps a product identity when the published GTIN is malformed", () => {
+  const document = parseHTML(`
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": "Volta City E1",
+        "brand": { "@type": "Brand", "name": "Volta" },
+        "model": "City E1",
+        "gtin13": "5901234987650",
+        "color": "Zielony",
+        "sku": "VLT-CE1-GRN",
+        "offers": {
+          "@type": "Offer",
+          "url": "/rowery/volta-city-e1",
+          "seller": { "@type": "Organization", "name": "Sklep Rowerowy" }
+        }
+      }
+    </script>
+  `).document;
+
+  const result = extractEntityCandidates(document, "https://sklep.example/rowery/volta-city-e1");
+  const product = result.candidates.find(({ entity }) => entity.type === "product");
+
+  assert.equal(product.id, "verity:product:model:volta:city%20e1:zielony");
+  assert.equal(product.entity.gtin, undefined);
+  assert.equal(result.diagnostics[0].code, "INCOMPLETE_ENTITY");
+  assert.match(result.diagnostics[0].message, /check digit/);
+});
+
+test("treats food establishment subtypes as places", () => {
+  const document = parseHTML(`
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Bakery",
+        "name": "Piekarnia Ziarno",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Długa 7",
+          "addressLocality": "Kraków",
+          "postalCode": "31-147",
+          "addressCountry": "PL"
+        }
+      }
+    </script>
+  `).document;
+
+  const result = extractEntityCandidates(document, "https://mapy.example/piekarnia-ziarno");
+
+  assert.equal(result.candidates.length, 1);
+  assert.equal(result.candidates[0].entity.type, "place");
+  assert.equal(result.candidates[0].entity.category, "Bakery");
+});
+
 test("rejects calls without a DOM document", () => {
   assert.throws(
     () => extractEntityCandidates(undefined, "https://example.com/item"),

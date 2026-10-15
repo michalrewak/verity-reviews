@@ -5,14 +5,57 @@ const PLACE_TYPES = new Set([
   "Place",
   "LocalBusiness",
   "Store",
-  "Restaurant",
   "LodgingBusiness",
   "Hotel",
+  "Hostel",
+  "Motel",
+  "Resort",
+  "BedAndBreakfast",
+  "Campground",
   "FoodEstablishment",
+  "Restaurant",
+  "Bakery",
+  "BarOrPub",
+  "Brewery",
+  "CafeOrCoffeeShop",
+  "Distillery",
+  "FastFoodRestaurant",
+  "IceCreamShop",
+  "Winery",
   "ProfessionalService",
   "MedicalBusiness",
+  "Dentist",
+  "Hospital",
+  "Pharmacy",
+  "Physician",
+  "VeterinaryCare",
   "AutomotiveBusiness",
-  "HomeAndConstructionBusiness"
+  "HomeAndConstructionBusiness",
+  "EntertainmentBusiness",
+  "SportsActivityLocation",
+  "ExerciseGym",
+  "HealthClub",
+  "GolfCourse",
+  "StadiumOrArena",
+  "MovieTheater",
+  "PerformingArtsTheater",
+  "Museum",
+  "Library",
+  "Park",
+  "Zoo",
+  "Aquarium",
+  "TouristAttraction",
+  "CivicStructure",
+  "GovernmentBuilding",
+  "PlaceOfWorship",
+  "Church",
+  "Airport",
+  "TrainStation",
+  "SubwayStation",
+  "BusStation",
+  "GasStation",
+  "School",
+  "CollegeOrUniversity"
 ]);
 
 export function extractEntityCandidates(document, pageUrl) {
@@ -116,7 +159,17 @@ function extractProductCandidates(product, canonicalUrl, diagnostics) {
     variant,
     name: scalar(product.name)
   });
-  const productCandidate = createCandidate(productEntity, "json-ld:Product", canonicalUrl, diagnostics);
+  let productCandidate = createCandidate(productEntity, "json-ld:Product", canonicalUrl, diagnostics);
+  if (!productCandidate && gtin !== undefined) {
+    // A malformed GTIN must not erase a product that brand and model already identify,
+    // otherwise the page degrades to a seller-specific offer.
+    productCandidate = createCandidate(
+      compactObject({ type: "product", brand, model, variant, name: scalar(product.name) }),
+      "json-ld:Product",
+      canonicalUrl,
+      diagnostics
+    );
+  }
   if (productCandidate) {
     candidates.push(productCandidate);
   }

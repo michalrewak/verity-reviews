@@ -40,6 +40,8 @@ async function initialize() {
 
 async function inspectActivePage() {
   setStatus("Reading the active page…");
+  activeCandidate = undefined;
+  activeResult = undefined;
   elements["entity-card"].hidden = true;
   elements["review-card"].hidden = true;
   try {
