@@ -8,7 +8,8 @@ The prototype reads:
 
 1. `link[rel=canonical]`;
 2. Schema.org JSON-LD `Product`, `ProductGroup`, `Offer`, and local-business/place subtypes;
-3. Open Graph title and site name as an offer fallback only when `og:type`
+3. Schema.org Microdata and RDFa for products and local-business/place subtypes;
+4. Open Graph title and site name as an offer fallback only when `og:type`
    identifies a product.
 
 Malformed JSON-LD is exposed through structured diagnostics rather than silently ignored.
@@ -60,8 +61,8 @@ product is unavailable.
 ## Live-site pilot
 
 A manual smoke test on 2026-10-15 fetched current public HTML and ran it through
-the adapter. The HTML was not saved in the repository; the cases below are
-represented by small, deterministic fixtures in the unit tests.
+the adapter. The HTML was not saved in the repository; the relevant metadata
+patterns are covered by small, deterministic fixtures in the unit tests.
 
 | Site/page | Observed result |
 | --- | --- |
@@ -71,7 +72,17 @@ represented by small, deterministic fixtures in the unit tests.
 | Samsung Galaxy S25 Ultra page | Product markup produced a product candidate from its brand and model identifier. |
 | Rijksmuseum and National Gallery visit pages | No supported place schema was present; neither generic `og:type=website` page was mislabeled as an offer. |
 | Starbucks store page | No parseable supported entity metadata was present. |
+| McDonald's Big Mac page | The product page exposed organization/page metadata and proprietary analytics data, but no supported product or venue entity. The adapter correctly does not infer the restaurant or product from that data. |
+| Louvre visit page | No supported place metadata was present. |
+| Boudin Bakery locations page | Published 25 `LocalBusiness` entries alongside a `CollectionPage`; the adapter now returns no candidate instead of allowing the UI to select the first listed location. Its canonical link also points to the blog. |
+| Boudin Bakery, Pier 39 location | Published one `LocalBusiness` with coordinates; adapter returned one place candidate: `verity:place:geo:37.80867:-122.40982:…`. |
 
 This is a point-in-time compatibility check, not a guarantee about third-party
 markup. Some sites block automated retrieval or vary metadata by region and
-session. Real page candidates remain proposals that users must confirm.
+session. Several restaurant and hotel sites returned HTTP 403, rate limits, or
+maintenance pages during the pilot. The Boudin listing exposed an actionable
+ambiguity bug: merely finding valid place records is not sufficient if the
+active page describes a collection. Microdata and RDFa support is covered by
+local standards-shaped fixtures; the live pages checked here exposed their
+venue records as JSON-LD. Real page candidates remain proposals that users
+must confirm.

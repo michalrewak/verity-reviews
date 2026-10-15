@@ -66,7 +66,11 @@ export function extractEntityCandidates(document, pageUrl) {
   const resolvedPageUrl = canonicalizeUrl(new URL(pageUrl).toString());
   const canonicalUrl = extractCanonicalUrl(document, resolvedPageUrl);
   const diagnostics = [];
-  const nodes = extractJsonLdNodes(document, diagnostics);
+  const nodes = [
+    ...extractJsonLdNodes(document, diagnostics),
+    ...extractMicrodataNodes(document),
+    ...extractRdfaNodes(document)
+  ];
   const nodesById = new Map(
     nodes
       .filter((node) => typeof node["@id"] === "string")
@@ -75,11 +79,12 @@ export function extractEntityCandidates(document, pageUrl) {
   const candidates = [];
 
   for (const node of nodes) {
+    const source = node.__veritySource ?? "json-ld";
     if (hasSchemaType(node, "Product") || hasSchemaType(node, "ProductGroup")) {
-      candidates.push(...extractProductCandidates(node, canonicalUrl, diagnostics, nodesById));
+      candidates.push(...extractProductCandidates(node, canonicalUrl, diagnostics, nodesById, source));
     }
     if (hasPlaceType(node)) {
-      const candidate = extractPlaceCandidate(node, canonicalUrl, diagnostics);
+      const candidate = extractPlaceCandidate(node, canonicalUrl, diagnostics, source);
       if (candidate) {
         candidates.push(candidate);
       }
@@ -89,17 +94,18 @@ export function extractEntityCandidates(document, pageUrl) {
   const isCollectionPage = nodes.some((node) =>
     schemaTypes(node).some((type) => ["CollectionPage", "ItemList", "SearchResultsPage"].includes(type))
   );
-  if (candidates.length === 0 && !isCollectionPage) {
-    const fallback = extractOpenGraphOffer(document, canonicalUrl, diagnostics);
-    if (fallback) {
-      candidates.push(fallback);
-    }
-  } else if (candidates.length === 0) {
+  if (isCollectionPage) {
+    candidates.length = 0;
     diagnostics.push({
       code: "NON_ENTITY_PAGE",
       source: "json-ld",
       message: "structured metadata describes a collection page, not one reviewable entity"
     });
+  } else if (candidates.length === 0) {
+    const fallback = extractOpenGraphOffer(document, canonicalUrl, diagnostics);
+    if (fallback) {
+      candidates.push(fallback);
+    }
   }
 
   return {
@@ -139,6 +145,116 @@ function extractJsonLdNodes(document, diagnostics) {
   return nodes;
 }
 
+function extractMicrodataNodes(document) {
+  return [...document.querySelectorAll("[itemscope][itemtype]")]
+    .map((element) => {
+      const types = schemaTypesFromUrls(element.getAttribute("itemtype"));
+      return types.length > 0 ? extractDomNode(element, "microdata", types) : undefined;
+    })
+    .filter(Boolean);
+}
+
+function extractRdfaNodes(document) {
+  return [...document.querySelectorAll("[typeof]")]
+    .map((element) => {
+      const types = schemaTypesFromRdfa(element.getAttribute("typeof"), element.getAttribute("vocab"));
+      return types.length > 0 ? extractDomNode(element, "rdfa", types) : undefined;
+    })
+    .filter(Boolean);
+}
+
+function extractDomNode(root, format, types) {
+  const scopeSelector = format === "microdata" ? "[itemscope]" : "[typeof]";
+  const propertySelector = format === "microdata" ? "[itemprop]" : "[property]";
+  const propertyAttribute = format === "microdata" ? "itemprop" : "property";
+  const node = { "@type": types, __veritySource: format };
+
+  for (const element of root.querySelectorAll(propertySelector)) {
+    if (element.parentElement?.closest(scopeSelector) !== root) {
+      continue;
+    }
+
+    const names = normalizePropertyNames(element.getAttribute(propertyAttribute));
+    if (names.length === 0) {
+      continue;
+    }
+
+    let value;
+    if (format === "microdata" && element.hasAttribute("itemscope")) {
+      const childTypes = schemaTypesFromUrls(element.getAttribute("itemtype"));
+      value = childTypes.length > 0 ? extractDomNode(element, format, childTypes) : undefined;
+    } else if (format === "rdfa" && element.hasAttribute("typeof")) {
+      const childTypes = schemaTypesFromRdfa(
+        element.getAttribute("typeof"),
+        element.getAttribute("vocab") || root.getAttribute("vocab")
+      );
+      value = childTypes.length > 0 ? extractDomNode(element, format, childTypes) : undefined;
+    } else {
+      value = propertyValue(element, format);
+    }
+
+    if (value === undefined || value === "") {
+      continue;
+    }
+    for (const name of names) {
+      node[name] = appendValue(node[name], value);
+    }
+  }
+
+  return node;
+}
+
+function schemaTypesFromUrls(value) {
+  return String(value ?? "")
+    .split(/\s+/)
+    .map((type) => type.trim())
+    .filter((type) => /(?:^|\/)schema\.org\/[^/]+\/?$/i.test(type))
+    .map((type) => type.split("/").filter(Boolean).at(-1));
+}
+
+function schemaTypesFromRdfa(value, vocab) {
+  const usesSchemaVocab = /(?:^|\/)schema\.org\/?$/i.test(String(vocab ?? ""));
+  return String(value ?? "")
+    .split(/\s+/)
+    .map((type) => {
+      if (/(?:^|\/)schema\.org\/[^/]+\/?$/i.test(type)) {
+        return type.split("/").filter(Boolean).at(-1);
+      }
+      if (usesSchemaVocab && /^(?:schema:)?[A-Z][A-Za-z]+$/.test(type)) {
+        return type.replace(/^schema:/i, "");
+      }
+      return undefined;
+    })
+    .filter(Boolean);
+}
+
+function normalizePropertyNames(value) {
+  return String(value ?? "")
+    .split(/\s+/)
+    .map((name) => name.split(":").at(-1))
+    .filter((name) => /^[A-Za-z][A-Za-z0-9]*$/.test(name));
+}
+
+function propertyValue(element, format) {
+  const attributes = format === "microdata"
+    ? ["content", "datetime", "href", "src", "data", "value"]
+    : ["content", "datetime", "resource", "href", "src", "about"];
+  for (const attribute of attributes) {
+    const value = element.getAttribute(attribute);
+    if (value !== null) {
+      return value.trim();
+    }
+  }
+  return element.textContent?.trim();
+}
+
+function appendValue(current, value) {
+  if (current === undefined) {
+    return value;
+  }
+  return Array.isArray(current) ? [...current, value] : [current, value];
+}
+
 function collectNodes(value, nodes) {
   if (Array.isArray(value)) {
     for (const item of value) {
@@ -158,7 +274,7 @@ function collectNodes(value, nodes) {
   }
 }
 
-function extractProductCandidates(product, canonicalUrl, diagnostics, nodesById) {
+function extractProductCandidates(product, canonicalUrl, diagnostics, nodesById, source) {
   const candidates = [];
   const gtin = GTIN_PROPERTIES.map((property) => scalar(product[property])).find(Boolean);
   const brand = namedBrand(product.brand, nodesById);
@@ -185,13 +301,13 @@ function extractProductCandidates(product, canonicalUrl, diagnostics, nodesById)
     variant,
     name: scalar(product.name)
   });
-  let productCandidate = createCandidate(productEntity, "json-ld:Product", canonicalUrl, diagnostics);
+  let productCandidate = createCandidate(productEntity, `${source}:Product`, canonicalUrl, diagnostics);
   if (!productCandidate && gtin !== undefined) {
     // A malformed GTIN must not erase a product that brand and model already identify,
     // otherwise the page degrades to a seller-specific offer.
     productCandidate = createCandidate(
       compactObject({ type: "product", brand, model, variant, name: scalar(product.name) }),
-      "json-ld:Product",
+      `${source}:Product`,
       canonicalUrl,
       diagnostics
     );
@@ -224,7 +340,7 @@ function extractProductCandidates(product, canonicalUrl, diagnostics, nodesById)
     });
     const offerCandidate = createCandidate(
       offerEntity,
-      "json-ld:Product.offers",
+      `${source}:Product.offers`,
       canonicalUrl,
       diagnostics
     );
@@ -236,7 +352,7 @@ function extractProductCandidates(product, canonicalUrl, diagnostics, nodesById)
   return candidates;
 }
 
-function extractPlaceCandidate(place, canonicalUrl, diagnostics) {
+function extractPlaceCandidate(place, canonicalUrl, diagnostics, source) {
   const address = objectValue(place.address);
   const geo = objectValue(place.geo);
   const entity = compactObject({
@@ -255,7 +371,7 @@ function extractPlaceCandidate(place, canonicalUrl, diagnostics) {
     category: schemaTypes(place).find((type) => type !== "LocalBusiness" && type !== "Place")
   });
 
-  return createCandidate(entity, "json-ld:LocalBusiness", canonicalUrl, diagnostics);
+  return createCandidate(entity, `${source}:LocalBusiness`, canonicalUrl, diagnostics);
 }
 
 function extractOpenGraphOffer(document, canonicalUrl, diagnostics) {

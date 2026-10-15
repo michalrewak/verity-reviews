@@ -124,6 +124,37 @@ test("does not treat collection pages as one product or generic Open Graph pages
   assert.equal(result.diagnostics[0].code, "NON_ENTITY_PAGE");
 });
 
+test("rejects all listed places on a collection page instead of leaving the first selectable", () => {
+  const document = parseHTML(`
+    <script type="application/ld+json">
+      [
+        {
+          "@context": "https://schema.org",
+          "@type": ["WebPage", "CollectionPage"],
+          "name": "Bakery locations"
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "name": "Bakery One",
+          "geo": { "@type": "GeoCoordinates", "latitude": 37.8, "longitude": -122.4 }
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "name": "Bakery Two",
+          "geo": { "@type": "GeoCoordinates", "latitude": 37.9, "longitude": -122.5 }
+        }
+      ]
+    </script>
+  `).document;
+
+  const result = extractEntityCandidates(document, "https://bakery.example/locations");
+
+  assert.deepEqual(result.candidates, []);
+  assert.equal(result.diagnostics[0].code, "NON_ENTITY_PAGE");
+});
+
 test("does not infer an offer from generic Open Graph website metadata", () => {
   const document = parseHTML(`
     <meta property="og:type" content="website">
@@ -147,6 +178,62 @@ test("extracts a LocalBusiness from an @graph", async () => {
   );
   assert.equal(result.candidates[0].entity.category, "Restaurant");
   assert.deepEqual(result.diagnostics, []);
+});
+
+test("extracts place metadata encoded as Schema.org Microdata", () => {
+  const document = parseHTML(`
+    <div itemscope itemtype="https://schema.org/Restaurant">
+      <span itemprop="name">GreatFood</span>
+      <div itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
+        <span itemprop="streetAddress">1901 Lemur Ave</span>
+        <span itemprop="addressLocality">Sunnyvale</span>
+        <span itemprop="addressRegion">CA</span>
+        <meta itemprop="addressCountry" content="US">
+        <span itemprop="postalCode">94086</span>
+      </div>
+      <div itemprop="geo" itemscope itemtype="https://schema.org/GeoCoordinates">
+        <meta itemprop="latitude" content="37.3688">
+        <meta itemprop="longitude" content="-122.0363">
+      </div>
+    </div>
+  `).document;
+
+  const result = extractEntityCandidates(document, "https://greatfood.example/");
+
+  assert.equal(result.candidates.length, 1);
+  assert.equal(result.candidates[0].entity.type, "place");
+  assert.equal(result.candidates[0].entity.name, "GreatFood");
+  assert.equal(result.candidates[0].source, "microdata:LocalBusiness");
+  assert.equal(
+    result.candidates[0].id,
+    "verity:place:address:us:sunnyvale:1901%20lemur%20ave:greatfood:94086"
+  );
+});
+
+test("extracts place metadata encoded as Schema.org RDFa", () => {
+  const document = parseHTML(`
+    <div vocab="https://schema.org/" typeof="Restaurant">
+      <span property="name">Tartine Bakery</span>
+      <div property="address" typeof="PostalAddress">
+        <span property="streetAddress">600 Guerrero St</span>
+        <span property="addressLocality">San Francisco</span>
+        <span property="addressRegion">CA</span>
+        <meta property="addressCountry" content="US">
+        <span property="postalCode">94110</span>
+      </div>
+    </div>
+  `).document;
+
+  const result = extractEntityCandidates(document, "https://tartinebakery.example/location");
+
+  assert.equal(result.candidates.length, 1);
+  assert.equal(result.candidates[0].entity.type, "place");
+  assert.equal(result.candidates[0].entity.category, "Restaurant");
+  assert.equal(result.candidates[0].source, "rdfa:LocalBusiness");
+  assert.equal(
+    result.candidates[0].id,
+    "verity:place:address:us:san%20francisco:600%20guerrero%20st:tartine%20bakery:94110"
+  );
 });
 
 test("resolves a relative offer URL when seller SKU identity is unavailable", () => {
