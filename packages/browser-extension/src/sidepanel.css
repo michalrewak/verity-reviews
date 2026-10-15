@@ -1,0 +1,24 @@
+:root {
+  color-scheme: light;
+  font: 14px/1.45 system-ui, sans-serif;
+  color: #17241f;
+  background: #f5f3ed;
+}
+
+body { margin: 0; }
+header, main { padding: 16px; }
+header { display: flex; justify-content: space-between; border-bottom: 1px solid #d9d6cc; }
+header span { display: block; color: #617068; font-size: 11px; }
+section, details { margin: 14px 0; padding: 14px; border: 1px solid #d9d6cc; border-radius: 10px; background: #fff; }
+h1, h2 { margin: 4px 0 10px; }
+h1 { font-size: 19px; }
+h2 { font-size: 15px; }
+label { display: grid; gap: 5px; margin: 10px 0; font-weight: 600; }
+input, select, textarea, button { box-sizing: border-box; width: 100%; padding: 9px; font: inherit; }
+textarea { min-height: 110px; resize: vertical; }
+button { border: 0; border-radius: 7px; color: #fff; background: #176b51; cursor: pointer; }
+header button { width: auto; padding: 6px 10px; }
+code { display: block; overflow-wrap: anywhere; color: #426054; font-size: 11px; }
+small { color: #617068; }
+#status[data-error="true"] { color: #a32929; }
+#diagnostics { padding-left: 22px; color: #8a4b1c; }

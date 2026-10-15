@@ -1,0 +1,19 @@
+{
+  "name": "Verity Reviews",
+  "short_name": "Verity",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f3ed",
+  "theme_color": "#176b51",
+  "share_target": {
+    "action": "./share",
+    "method": "GET",
+    "enctype": "application/x-www-form-urlencoded",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+}

@@ -37,8 +37,12 @@ export function validateReview(review) {
   if (!REVIEW_STATUSES.has(review.status)) {
     errors.push("status is invalid");
   }
-  if (review.evidenceCommitment !== undefined && typeof review.evidenceCommitment !== "string") {
-    errors.push("evidenceCommitment must be a string when provided");
+  if (
+    review.evidenceCommitment !== undefined &&
+    (typeof review.evidenceCommitment !== "string" ||
+      !/^sha256:[0-9a-f]{64}$/.test(review.evidenceCommitment))
+  ) {
+    errors.push("evidenceCommitment must be a SHA-256 identifier when provided");
   }
 
   return errors;

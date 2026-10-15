@@ -37,3 +37,13 @@ Page metadata can be incomplete, stale, or intentionally false. Before accepting
 - compare candidates with known aliases from an indexer;
 - retain the source URL and extraction time;
 - never treat Schema.org markup as proof of purchase or merchant ownership.
+
+## Extension integration
+
+The Phase 1 extension captures the active tab's HTML with `activeTab` and
+`scripting` permissions, parses it in the side panel, and invokes this adapter.
+The extension build copies the adapter and its core identity dependency into
+the unpacked artifact rather than maintaining a second extraction
+implementation. Product and place candidates are submitted to
+`POST /v1/resolve`; offers remain valid local review targets when a canonical
+product is unavailable.

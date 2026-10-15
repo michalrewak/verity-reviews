@@ -1,4 +1,5 @@
 import { validateReview } from "./review.mjs";
+import { decodeEd25519DidKey } from "./did-key.mjs";
 
 const EVENT_KIND = "verity.review";
 const EVENT_VERSION = 1;
@@ -38,7 +39,7 @@ export async function createSignedReviewEvent(review, privateKey, cryptoProvider
 }
 
 export async function verifySignedReviewEvent(event, publicKey, cryptoProvider = globalThis.crypto) {
-  const errors = validateEventEnvelope(event);
+  const errors = validateSignedReviewEvent(event);
   if (errors.length > 0) {
     return { valid: false, errors };
   }
@@ -68,7 +69,33 @@ export async function verifySignedReviewEvent(event, publicKey, cryptoProvider =
   return { valid: errors.length === 0, errors };
 }
 
-function validateEventEnvelope(event) {
+export async function verifyReviewEventSignature(event, cryptoProvider = globalThis.crypto) {
+  const errors = validateSignedReviewEvent(event);
+  if (errors.length > 0) {
+    return { valid: false, errors };
+  }
+  requireCrypto(cryptoProvider);
+
+  let publicKey;
+  try {
+    publicKey = await cryptoProvider.subtle.importKey(
+      "raw",
+      decodeEd25519DidKey(event.review.authorKeyId),
+      { name: SIGNATURE_ALGORITHM },
+      false,
+      ["verify"]
+    );
+  } catch (error) {
+    return {
+      valid: false,
+      errors: [`author key cannot be resolved from authorKeyId: ${error.message}`]
+    };
+  }
+
+  return verifySignedReviewEvent(event, publicKey, cryptoProvider);
+}
+
+export function validateSignedReviewEvent(event) {
   if (!event || typeof event !== "object") {
     return ["event must be an object"];
   }

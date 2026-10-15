@@ -12,7 +12,7 @@ const validReview = {
   createdAt: "2026-10-14T17:00:00.000Z",
   revision: 1,
   status: "published",
-  evidenceCommitment: "sha256:example"
+  evidenceCommitment: `sha256:${"a".repeat(64)}`
 };
 
 test("accepts a structurally valid review", () => {
@@ -39,6 +39,11 @@ test("rejects short text", () => {
 
 test("does not require evidence for an unverified review", () => {
   assert.equal(isValidReview({ ...validReview, evidenceCommitment: undefined }), true);
+});
+
+test("rejects a malformed evidence commitment", () => {
+  const errors = validateReview({ ...validReview, evidenceCommitment: "sha256:example" });
+  assert.ok(errors.includes("evidenceCommitment must be a SHA-256 identifier when provided"));
 });
 
 test("requires a positive revision number", () => {

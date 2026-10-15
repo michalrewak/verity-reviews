@@ -33,7 +33,20 @@ These rules ensure that independent clients produce the same bytes for equivalen
 
 ## Key handling
 
-The `signature.keyId` must equal `review.authorKeyId`. The format supports DID key identifiers but does not require a single DID method.
+The `signature.keyId` must equal `review.authorKeyId`. The MVP requires an
+Ed25519 `did:key` identifier (multicodec `0xed01`, base58btc, `did:key:z…`) so
+that the public key is recoverable from the event itself and any party can
+verify a review without a key directory or trust in the distributing UI.
+
+Receiving systems must reject an event unless:
+
+- the canonical payload digest equals `contentId`;
+- `signature.keyId` equals `review.authorKeyId`;
+- the Ed25519 signature verifies against the public key decoded from
+  `review.authorKeyId`.
+
+The Verity API enforces all three before storing an event, so a tampered or
+forged event can neither be stored nor overwrite an existing record.
 
 Private keys must remain in platform key storage:
 
