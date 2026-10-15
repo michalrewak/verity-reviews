@@ -67,11 +67,16 @@ export function extractEntityCandidates(document, pageUrl) {
   const canonicalUrl = extractCanonicalUrl(document, resolvedPageUrl);
   const diagnostics = [];
   const nodes = extractJsonLdNodes(document, diagnostics);
+  const nodesById = new Map(
+    nodes
+      .filter((node) => typeof node["@id"] === "string")
+      .map((node) => [node["@id"], node])
+  );
   const candidates = [];
 
   for (const node of nodes) {
-    if (hasSchemaType(node, "Product")) {
-      candidates.push(...extractProductCandidates(node, canonicalUrl, diagnostics));
+    if (hasSchemaType(node, "Product") || hasSchemaType(node, "ProductGroup")) {
+      candidates.push(...extractProductCandidates(node, canonicalUrl, diagnostics, nodesById));
     }
     if (hasPlaceType(node)) {
       const candidate = extractPlaceCandidate(node, canonicalUrl, diagnostics);
@@ -81,11 +86,20 @@ export function extractEntityCandidates(document, pageUrl) {
     }
   }
 
-  if (candidates.length === 0) {
+  const isCollectionPage = nodes.some((node) =>
+    schemaTypes(node).some((type) => ["CollectionPage", "ItemList", "SearchResultsPage"].includes(type))
+  );
+  if (candidates.length === 0 && !isCollectionPage) {
     const fallback = extractOpenGraphOffer(document, canonicalUrl, diagnostics);
     if (fallback) {
       candidates.push(fallback);
     }
+  } else if (candidates.length === 0) {
+    diagnostics.push({
+      code: "NON_ENTITY_PAGE",
+      source: "json-ld",
+      message: "structured metadata describes a collection page, not one reviewable entity"
+    });
   }
 
   return {
@@ -144,11 +158,23 @@ function collectNodes(value, nodes) {
   }
 }
 
-function extractProductCandidates(product, canonicalUrl, diagnostics) {
+function extractProductCandidates(product, canonicalUrl, diagnostics, nodesById) {
   const candidates = [];
   const gtin = GTIN_PROPERTIES.map((property) => scalar(product[property])).find(Boolean);
-  const brand = namedValue(product.brand);
-  const model = namedValue(product.model) || scalar(product.mpn) || scalar(product.name);
+  const brand = namedBrand(product.brand, nodesById);
+  const variantModels = asArray(product.hasVariant)
+    .map((variant) => scalar(variant?.mpn) || scalar(variant?.model))
+    .filter(Boolean);
+  const sharedVariantModel =
+    variantModels.length > 0 && variantModels.every((model) => model === variantModels[0])
+      ? variantModels[0]
+      : undefined;
+  const model =
+    namedValue(product.model) ||
+    scalar(product.mpn) ||
+    sharedVariantModel ||
+    scalar(product.productGroupID) ||
+    scalar(product.name);
   const variant = [scalar(product.color), scalar(product.size)].filter(Boolean).join(" / ") || undefined;
 
   const productEntity = compactObject({
@@ -233,6 +259,11 @@ function extractPlaceCandidate(place, canonicalUrl, diagnostics) {
 }
 
 function extractOpenGraphOffer(document, canonicalUrl, diagnostics) {
+  const type = metaContent(document, "og:type")?.toLowerCase();
+  if (!type?.startsWith("product")) {
+    return undefined;
+  }
+
   const title = metaContent(document, "og:title");
   const siteName = metaContent(document, "og:site_name");
   if (!title || !siteName) {
@@ -307,6 +338,39 @@ function scalar(value) {
 
 function namedValue(value) {
   return scalar(value) || scalar(objectValue(value)?.name) || scalar(objectValue(value)?.["@id"]);
+}
+
+function namedBrand(value, nodesById) {
+  const object = objectValue(value);
+  const directName = scalar(object?.name);
+  if (directName) {
+    return directName;
+  }
+
+  const identifier = scalar(object?.["@id"]) || scalar(value);
+  if (!identifier) {
+    return undefined;
+  }
+
+  const referencedName = scalar(nodesById.get(identifier)?.name);
+  if (referencedName) {
+    return referencedName;
+  }
+
+  try {
+    const hostname = new URL(identifier).hostname.replace(/^www\./i, "");
+    const label = hostname.split(".")[0];
+    return label
+      .split(/[-_]/)
+      .filter(Boolean)
+      .map((part) => part[0].toUpperCase() + part.slice(1))
+      .join(" ");
+  } catch (error) {
+    if (error instanceof TypeError) {
+      return identifier;
+    }
+    throw error;
+  }
 }
 
 function objectValue(value) {
